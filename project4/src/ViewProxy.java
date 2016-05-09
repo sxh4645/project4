@@ -50,7 +50,6 @@ public class ViewProxy implements ModelListener
 		out.writeByte('J');
 		out.writeByte(player);
 		out.flush();
-		
 	}
 
 	public void setName(int player, String name) throws IOException {
@@ -99,7 +98,7 @@ public class ViewProxy implements ModelListener
 					for (;;)
 					{
 						String name;
-						int r, c, id;
+						int c, id;
 						
 						byte b = in.readByte();
 						

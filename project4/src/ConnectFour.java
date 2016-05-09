@@ -10,14 +10,7 @@ import java.net.UnknownHostException;
  */
 public class ConnectFour {
 
-	public static void main(String[] args) throws Exception {
-		
-		//DEBUG REMOVE ME
-		args = new String[3];
-		args[0] = "localhost";
-		args[1] = "8080";
-		args[2] = "Bob2";
-		
+	public static void main(String[] args) throws Exception {		
 		
 		//java ConnectFour localhost 5678 Blake
 		if ( args.length != 3){

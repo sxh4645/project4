@@ -28,6 +28,11 @@ public class C4Board implements C4BoardIntf{
 		BoardState[r][c] = player;
 	}
 	
+	/**
+	 * 
+	 * @param c column to check if a valid move exists
+	 * @return int return of location, -1 if not found
+	 */
 	public int validMove(int c){
 		int r;
 		for (r = ROWS - 1; r > 0; r--){

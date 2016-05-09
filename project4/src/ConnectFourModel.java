@@ -2,6 +2,12 @@ import java.util.LinkedList;
 import java.io.IOException;
 import java.util.Iterator;
 
+/**
+ * Model to keep track of the two players in a singleton board.
+ * 
+ * @author Shane
+ *
+ */
 public class ConnectFourModel implements ViewListener{
 
 	// Hidden data members.
@@ -56,6 +62,9 @@ public class ConnectFourModel implements ViewListener{
 
 	}	
 	
+	/**
+	 * When a player joins the game alert all players
+	 */
 	public void join(ViewProxy proxy, String name) {
 		try{
 			if(players == 1){
@@ -86,6 +95,9 @@ public class ConnectFourModel implements ViewListener{
 		}		
 	}
 
+	/**
+	 * Create a new game and reset the turns
+	 */
 	public void newGame() throws IOException {
 		board.resetBoard();
 		
@@ -98,6 +110,9 @@ public class ConnectFourModel implements ViewListener{
 
 	}
 
+	/**
+	 * Check if the action is valid, if not do not report anything
+	 */
 	public void action(int player, int column) throws IOException {
 		int row = board.validMove(column);
 		
