@@ -87,7 +87,11 @@ public class C4UI implements ModelListener
 					if (playerTurn == player){
 						int c = boardPanel.clickToColumn (e);
 
-						viewListener.action(player, c);
+						try {
+							viewListener.action(player, c);
+						} catch (IOException ex) {
+							System.err.println(ex);
+						}
 
 					}
 				}
@@ -98,7 +102,11 @@ public class C4UI implements ModelListener
 			{
 			public void actionPerformed (ActionEvent e)
 				{
-					viewListener.newGame();
+					try {
+						viewListener.newGame();
+					} catch (IOException ex) {
+						System.err.println(ex);
+					}
 				}
 			});
 

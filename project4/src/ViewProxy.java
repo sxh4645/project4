@@ -23,8 +23,8 @@ public class ViewProxy implements ModelListener
 	*/	
 	public ViewProxy(Socket socket) throws IOException{
 		this.socket = socket;
-		out = new DataOutputStream (socket.getOutputStream());
-		in = new DataInputStream (socket.getInputStream());
+		out 		= new DataOutputStream (socket.getOutputStream());
+		in 			= new DataInputStream (socket.getInputStream());
 	}
 	
 	// Exported operations.
@@ -46,29 +46,100 @@ public class ViewProxy implements ModelListener
         }		
 	}
 	
-	public void playerJoin(int player) {
-		// TODO Auto-generated method stub
+	public void playerJoin(int player) throws IOException {
+		out.writeByte('J');
+		out.writeByte(player);
+		out.flush();
 		
 	}
 
-	public void setName(int player, String name) {
-		// TODO Auto-generated method stub
+	public void setName(int player, String name) throws IOException {
+		out.writeByte('N');
+		out.writeByte(player);
+		out.writeUTF(name);
+		out.flush();
 		
 	}
 
-	public void setTurn(int player) {
-		// TODO Auto-generated method stub
+	public void setTurn(int player) throws IOException {
+		out.writeByte('T');
+		out.writeByte(player);
+		out.flush();	
+	}
+
+	public void addMove(int player, int r, int c) throws IOException {
+		out.writeByte('A');
+		out.writeByte(player);
+		out.writeByte(r);
+		out.writeByte(c);
+		out.flush();
 		
 	}
 
-	public void addMove(int player, int r, int c) {
-		// TODO Auto-generated method stub
-		
+	public void newGame() throws IOException {
+		out.writeByte('C');
+		out.flush();		
 	}
+	
+	// Hidden helper classes.
 
-	public void newGame() {
-		// TODO Auto-generated method stub
-		
-	}
+	/**
+	* Class ReaderThread receives messages from the network, decodes them, and
+	* invokes the proper methods to process them.
+	*
+	* @author  Shane Hare
+	*
+	*/
+	private class ReaderThread extends Thread
+	{
+			public void run()
+			{
+				try
+	            {
+					for (;;)
+					{
+						String name;
+						int r, c;
+						
+						byte b = in.readByte();
+						
+						System.out.print("ServerInc: " + b + " ");
+						
+						switch (b)
+						{
+						case 'J':
+							name = in.readUTF();
+							System.out.println(name);
+							viewListener.join (ViewProxy.this, name);
+							break;
+						case 'A':
+							r = in.readByte();
+							c = in.readByte();
+							//viewListener.addMarker (r, c, color);
+							break;
+						case 'C':
+							viewListener.newGame();
+							break;
+						default:
+							System.err.println ("Bad message");
+							break;
+						}
+	               }
+	            }
+			catch (IOException exc)
+			{
+			}
+			finally
+			{
+				try
+				{
+					socket.close();
+				}
+			    catch (IOException exc)
+				{
+				}
+		    }
+		 }
+      }
 
-}
+   }	

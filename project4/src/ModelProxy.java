@@ -1,8 +1,8 @@
 
-import java.io.PrintStream;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
-import java.util.Scanner;
 
 /**
  * 
@@ -14,10 +14,10 @@ import java.util.Scanner;
 public class ModelProxy implements ViewListener{
 
 	// Hidden data members.
-    private Socket socket;
-    private Scanner in;
-    private PrintStream out;
-    private ModelListener modelListener;
+	private Socket socket;
+	private DataOutputStream out;
+	private DataInputStream in;
+	private ModelListener modelListener;
     
     // Exported constructors.
     /**
@@ -26,8 +26,8 @@ public class ModelProxy implements ViewListener{
     */
     public ModelProxy(Socket socket) throws IOException{
         this.socket = socket;
-		out = new PrintStream(socket.getOutputStream());
-		in  = new Scanner(socket.getInputStream());
+        out = new DataOutputStream (socket.getOutputStream());
+        in = new DataInputStream (socket.getInputStream());
     }
     
     // Exported operations.
@@ -43,26 +43,32 @@ public class ModelProxy implements ViewListener{
 	/**
 	* join with the player name to send to the server
 	* ... 
+	 * @throws IOException 
 	*/
-	public void join(String name)
+	public void join(ViewProxy proxy, String name) throws IOException
 	{
-	    out.print("join " + name + System.lineSeparator());
+		out.writeByte('J');
+		out.writeUTF(name);
 	    out.flush();
 	}
     
 	/**
 	 * Sends the clear code to the server to reset the game
+	 * @throws IOException 
 	 */
-	public void newGame() {
-		out.print("clear" + System.lineSeparator());
+	public void newGame() throws IOException {
+		out.writeByte('C');
 		out.flush();
 	}
 
 	/**
 	 * Sends the move made from the UI to the server
+	 * @throws IOException 
 	 */
-	public void action(int player, int column) {
-		out.print("add " + player + " " + column + System.lineSeparator());
+	public void action(int player, int column) throws IOException {
+		out.writeByte('A');
+		out.writeByte(player);
+		out.writeByte(column);
 		out.flush();		
 	}    
     
@@ -79,28 +85,38 @@ public class ModelProxy implements ViewListener{
             try {        	
                 while (true) {
                 	
-                	String read = in.nextLine();
-                	String[] data = read.split(" ");          	
+                	String name;
+                	int r, c, id, t;
                 	
-                    switch (data[0]) {
+                	byte b = in.readByte();                	        	
+                	
+                    switch (b) {
                         // number <p>
-                        case "number":
-                        	modelListener.playerJoin(Integer.parseInt(data[1]));
+                        case 'J':
+                        	id = in.readByte();
+                        	System.out.println("ClientInc: " + b + " " + id);
+                        	modelListener.playerJoin(id);
                             break;
                         // name <p> <n>
-                        case "name":
-                        	modelListener.setName(Integer.parseInt(data[1]), data[2]);
+                        case 'N':
+                        	id 		= in.readByte();
+                        	name 	= in.readUTF();
+                        	System.out.println("ClientInc: " + b + " " + id + " " + name);
+                        	modelListener.setName(id, name);
                         	break;
                         //turn <p>
-                        case "turn":
-                        	modelListener.setTurn(Integer.parseInt(data[1]));
+                        case 'T':
+                        	t = in.readByte();
+                        	modelListener.setTurn(t);
                         	break;
                         //add <p> <r> <c>
-                        case "add":
-                        	modelListener.addMove(Integer.parseInt(data[1]),
-                        			Integer.parseInt(data[2]), Integer.parseInt(data[3]));
+                        case 'A':
+                        	id = in.readByte();
+                        	r = in.readByte();
+                        	c = in.readByte();
+                        	modelListener.addMove(id, r, c);
                         	break;
-                        case "clear":
+                        case 'C':
                         	modelListener.newGame();
                         	break;
                         default:

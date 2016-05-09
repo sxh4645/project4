@@ -12,6 +12,13 @@ public class ConnectFour {
 
 	public static void main(String[] args) throws Exception {
 		
+		//DEBUG REMOVE ME
+		args = new String[3];
+		args[0] = "localhost";
+		args[1] = "8080";
+		args[2] = "Bob";
+		
+		
 		//java ConnectFour localhost 5678 Blake
 		if ( args.length != 3){
 			System.err.println("Usage: java ConnectFour <host> <port> <name>");
@@ -35,7 +42,7 @@ public class ConnectFour {
 	        
 			view.setViewListener(proxy);
 			proxy.setModelListener(view);
-			proxy.join(name);			
+			proxy.join(null, name);			
 		}
 		catch(UnknownHostException ex){
 			System.err.println("UnknownHost at " + host);

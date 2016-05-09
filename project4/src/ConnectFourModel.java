@@ -10,7 +10,8 @@ public class ConnectFourModel implements ViewListener{
 	private LinkedList<ModelListener> listeners =
 	      new LinkedList<ModelListener>();
 	
-	
+	private int players = 0;
+	private int turn 	= 0;
 	
 	// Exported constructors.
 
@@ -27,25 +28,61 @@ public class ConnectFourModel implements ViewListener{
 	* Add the given model listener to this Go model.
 	*
 	* @param  modelListener  Model listener.
+	 * @throws IOException 
 	*/
 	public synchronized void addModelListener (ModelListener modelListener)
 	{
-		listeners.add (modelListener);
+		try{
+
+			//Determine Players
+			if(players == 0){
+				players = 1;
+			}
+			else if (players == 1){
+				players = 2;
+			}
+			
+			modelListener.playerJoin(players);
+						
+			listeners.add (modelListener);		
+			
+		}
+		catch(IOException ex){
+			//Don't record bad listener
+			players = players - 1;
+			System.err.println(ex);
+		}
+
 	}	
 	
-	public void join(String name) {
-		// TODO Auto-generated method stub
-		
+	public void join(ViewProxy proxy, String name) {
+		try{
+			proxy.setName(players, name);
+		}
+		catch(IOException ex){
+			System.err.println(ex);
+		}		
 	}
 
 	public void newGame() {
-		// TODO Auto-generated method stub
+		board.resetBoard();
 		
+		turn = 1;
+		
+		try{
+			Iterator<ModelListener> iter = listeners.iterator();
+			while (iter.hasNext()){
+				ModelListener listener = iter.next();
+				listener.setTurn(turn);
+			}
+		}
+		catch(IOException ex){
+			
+		}
 	}
 
 	public void action(int player, int column) {
-		// TODO Auto-generated method stub
-		
+			
 	}
 
 }

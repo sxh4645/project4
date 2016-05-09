@@ -10,11 +10,27 @@ import java.util.HashMap;
 public class SessionManager implements ViewListener{
 
 	// Hidden data members.
-	   private HashMap<Integer,ConnectFourModel> sessions =
+    private HashMap<Integer,ConnectFourModel> sessions =
 	      new HashMap<Integer,ConnectFourModel>();	
+	   
+	private int sessionID = 0;
 	
-	public void join(String name) {
-				
+	public synchronized void join(ViewProxy proxy, String name) {
+		ConnectFourModel model = sessions.get(sessionID);
+		if (model == null){
+			System.out.println("Creating new Session");
+			model = new ConnectFourModel();
+			sessions.put(sessionID, model);
+		}
+		else{
+			System.out.println("Found Existing Session");
+			//Two Players found, go to next Iteration
+			sessionID = sessionID + 1;
+		}
+		
+		model.addModelListener(proxy);
+		proxy.setViewListener(model);
+		model.join(proxy, name);
 	}
 
 	public void newGame() {

@@ -6,6 +6,11 @@ public class ConnectFourServer {
 	
 	public static void main (String[] args) throws Exception
     {
+		//DEBUG REMOVE ME
+		args = new String[2];
+		args[0] = "localhost";
+		args[1] = "8080";
+		
 		if (args.length != 2) usage();
 		String host = args[0];
 		int port = Integer.parseInt (args[1]);
