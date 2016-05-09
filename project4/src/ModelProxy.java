@@ -47,9 +47,11 @@ public class ModelProxy implements ViewListener{
 	*/
 	public void join(ViewProxy proxy, String name) throws IOException
 	{
-		out.writeByte('J');
-		out.writeUTF(name);
-	    out.flush();
+		if (!socket.isClosed()){
+			out.writeByte('J');
+			out.writeUTF(name);
+		    out.flush();
+		}
 	}
     
 	/**
@@ -57,8 +59,10 @@ public class ModelProxy implements ViewListener{
 	 * @throws IOException 
 	 */
 	public void newGame() throws IOException {
-		out.writeByte('C');
-		out.flush();
+		if (!socket.isClosed()){
+			out.writeByte('C');
+			out.flush();
+		}
 	}
 
 	/**
@@ -66,10 +70,12 @@ public class ModelProxy implements ViewListener{
 	 * @throws IOException 
 	 */
 	public void action(int player, int column) throws IOException {
-		out.writeByte('A');
-		out.writeByte(player);
-		out.writeByte(column);
-		out.flush();		
+		if (!socket.isClosed()){
+			out.writeByte('A');
+			out.writeByte(player);
+			out.writeByte(column);
+			out.flush();
+		}
 	}    
     
 
@@ -94,14 +100,12 @@ public class ModelProxy implements ViewListener{
                         // number <p>
                         case 'J':
                         	id = in.readByte();
-                        	System.out.println("ClientInc: " + b + " " + id);
                         	modelListener.playerJoin(id);
                             break;
                         // name <p> <n>
                         case 'N':
                         	id 		= in.readByte();
                         	name 	= in.readUTF();
-                        	System.out.println("ClientInc: " + b + " " + id + " " + name);
                         	modelListener.setName(id, name);
                         	break;
                         //turn <p>

@@ -16,7 +16,7 @@ public class ConnectFour {
 		args = new String[3];
 		args[0] = "localhost";
 		args[1] = "8080";
-		args[2] = "Bob";
+		args[2] = "Bob2";
 		
 		
 		//java ConnectFour localhost 5678 Blake

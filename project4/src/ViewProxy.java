@@ -99,11 +99,9 @@ public class ViewProxy implements ModelListener
 					for (;;)
 					{
 						String name;
-						int r, c;
+						int r, c, id;
 						
 						byte b = in.readByte();
-						
-						System.out.print("ServerInc: " + b + " ");
 						
 						switch (b)
 						{
@@ -113,9 +111,9 @@ public class ViewProxy implements ModelListener
 							viewListener.join (ViewProxy.this, name);
 							break;
 						case 'A':
-							r = in.readByte();
+							id = in.readByte();
 							c = in.readByte();
-							//viewListener.addMarker (r, c, color);
+							viewListener.action(id, c);
 							break;
 						case 'C':
 							viewListener.newGame();

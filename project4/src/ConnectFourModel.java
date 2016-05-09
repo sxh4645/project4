@@ -6,9 +6,12 @@ public class ConnectFourModel implements ViewListener{
 
 	// Hidden data members.
 	private C4Board board = new C4Board();
+		
+	private ModelListener playerOne = null;
+	private ModelListener playerTwo = null;
 	
-	private LinkedList<ModelListener> listeners =
-	      new LinkedList<ModelListener>();
+	private String playerOneName = "";
+	private String playerTwoName = "";
 	
 	private int players = 0;
 	private int turn 	= 0;
@@ -37,52 +40,92 @@ public class ConnectFourModel implements ViewListener{
 			//Determine Players
 			if(players == 0){
 				players = 1;
+				playerOne = modelListener;
 			}
 			else if (players == 1){
 				players = 2;
-			}
+				playerTwo = modelListener;
+			}		
 			
-			modelListener.playerJoin(players);
-						
-			listeners.add (modelListener);		
+			modelListener.playerJoin(players);	
 			
 		}
 		catch(IOException ex){
 			//Don't record bad listener
-			players = players - 1;
-			System.err.println(ex);
 		}
 
 	}	
 	
 	public void join(ViewProxy proxy, String name) {
 		try{
-			proxy.setName(players, name);
+			if(players == 1){
+				this.playerOneName = name;
+			}
+			else if (players == 2){
+				this.playerTwoName = name;
+			}
+			
+			if (playerOne != null){
+				playerOne.setName(1, playerOneName);
+			}
+			
+			if (playerTwo != null){
+				playerTwo.setName(1, playerOneName);
+				playerTwo.setName(2, playerTwoName);
+				
+				playerOne.setName(2, playerTwoName);
+			} 
+			
+			if (players == 2){
+				newGame();
+			}
+			
 		}
 		catch(IOException ex){
 			System.err.println(ex);
 		}		
 	}
 
-	public void newGame() {
+	public void newGame() throws IOException {
 		board.resetBoard();
 		
-		turn = 1;
+		playerOne.newGame();
+		playerTwo.newGame();
 		
-		try{
-			Iterator<ModelListener> iter = listeners.iterator();
-			while (iter.hasNext()){
-				ModelListener listener = iter.next();
-				listener.setTurn(turn);
-			}
-		}
-		catch(IOException ex){
-			
-		}
+		turn = 1;
+		playerOne.setTurn(turn);
+		playerTwo.setTurn(turn);
+
 	}
 
-	public void action(int player, int column) {
-			
+	public void action(int player, int column) throws IOException {
+		int row = board.validMove(column);
+		
+		if (row != -1){
+			board.addPlayerMarker(player, row, column);
+			playerOne.addMove(player, row, column);
+			playerTwo.addMove(player, row, column);
+		}
+		
+		boolean dead = board.deadGame();
+				
+		int[] win = board.hasWon();
+		
+		if (win != null || dead){
+			turn = 0;
+		}
+		else{
+			if (turn == 1){
+				turn = 2;
+			}
+			else{
+				turn = 1;
+			}
+		}
+		
+		playerOne.setTurn(turn);
+		playerTwo.setTurn(turn);		
+		
 	}
 
 }

@@ -28,6 +28,17 @@ public class C4Board implements C4BoardIntf{
 		BoardState[r][c] = player;
 	}
 	
+	public int validMove(int c){
+		int r;
+		for (r = ROWS - 1; r > 0; r--){
+			if (BoardState[r][c] == 0){
+				return r;
+			}
+		}
+		
+		return -1;
+	}
+	
 	/**
 	 * Resets the current board to the zero state
 	 */
